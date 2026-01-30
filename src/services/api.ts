@@ -56,11 +56,10 @@ api.interceptors.response.use(
 
 export const authService = {
   login: async (email: string, password: string) => {
-    // Backend uses /auth/login with username or externalUserId (no password)
-    // For admin, we use the username as identifier
-    const response = await api.post('/auth/login', {
-      username: email,
-      externalUserId: email
+    // Admin login with email and password
+    const response = await api.post('/auth/admin/login', {
+      email,
+      password
     });
     // Response format: { success, data: { user, accessToken, refreshToken } }
     const data = response.data.data || response.data;
