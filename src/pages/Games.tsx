@@ -171,8 +171,8 @@ const Games: React.FC = () => {
     }
   };
 
-  const games = gamesData?.items || gamesData || [];
-  const totalGames = gamesData?.total || games.length;
+  const games: GameSession[] = (gamesData?.items || gamesData?.sessions || (Array.isArray(gamesData) ? gamesData : [])) as GameSession[];
+  const totalGames = gamesData?.total || gamesData?.pagination?.total || games.length;
 
   if (error) {
     return (
@@ -292,7 +292,7 @@ const Games: React.FC = () => {
                         </TableCell>
                       </TableRow>
                     ) : (
-                      games.map((game: GameSession) => (
+                      games.map((game) => (
                         <TableRow key={game.id} hover>
                           <TableCell>
                             <Typography variant="body2" fontFamily="monospace">

@@ -188,19 +188,19 @@ const Transactions: React.FC = () => {
     }
   };
 
-  const transactions = transactionsData?.items || transactionsData || [];
-  const totalTransactions = transactionsData?.total || transactions.length;
+  const transactions: Transaction[] = (transactionsData?.items || transactionsData?.transactions || (Array.isArray(transactionsData) ? transactionsData : [])) as Transaction[];
+  const totalTransactions = transactionsData?.total || transactionsData?.pagination?.total || transactions.length;
 
   // Calculate stats from current page data
   const pendingWithdrawals = transactions
-    .filter((t: Transaction) => t.type === 'WITHDRAWAL' && t.status === 'PENDING')
-    .reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0);
+    .filter((t) => t.type === 'WITHDRAWAL' && t.status === 'PENDING')
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
 
   const todayDeposits = transactions
-    .filter((t: Transaction) => t.type === 'DEPOSIT' && t.status === 'COMPLETED')
-    .reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0);
+    .filter((t) => t.type === 'DEPOSIT' && t.status === 'COMPLETED')
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
 
-  const pendingCount = transactions.filter((t: Transaction) => t.status === 'PENDING').length;
+  const pendingCount = transactions.filter((t) => t.status === 'PENDING').length;
 
   if (error) {
     return (
@@ -377,7 +377,7 @@ const Transactions: React.FC = () => {
                         </TableCell>
                       </TableRow>
                     ) : (
-                      transactions.map((txn: Transaction) => (
+                      transactions.map((txn) => (
                         <TableRow key={txn.id} hover>
                           <TableCell>
                             <Typography variant="body2" fontFamily="monospace">

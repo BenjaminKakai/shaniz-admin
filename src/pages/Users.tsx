@@ -232,7 +232,7 @@ const Users: React.FC = () => {
     return items;
   };
 
-  const users = data?.users || [];
+  const users: User[] = (data?.users || []) as User[];
   const totalUsers = data?.pagination?.total || 0;
 
   if (error) {
@@ -289,7 +289,7 @@ const Users: React.FC = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {users.map((user: User) => (
+                    {users.map((user) => (
                       <TableRow key={user.id} hover>
                         <TableCell>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>

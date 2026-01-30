@@ -234,14 +234,14 @@ const Tournaments: React.FC = () => {
     }
   };
 
-  const tournaments = tournamentsData?.items || tournamentsData || [];
-  const totalTournaments = tournamentsData?.total || tournaments.length;
+  const tournaments: Tournament[] = (tournamentsData?.items || tournamentsData?.tournaments || (Array.isArray(tournamentsData) ? tournamentsData : [])) as Tournament[];
+  const totalTournaments = tournamentsData?.total || tournamentsData?.pagination?.total || tournaments.length;
 
   // Calculate stats
-  const openCount = tournaments.filter((t: Tournament) => t.status === 'OPEN' || t.status === 'REGISTRATION').length;
-  const inProgressCount = tournaments.filter((t: Tournament) => t.status === 'IN_PROGRESS').length;
-  const totalParticipants = tournaments.reduce((sum: number, t: Tournament) => sum + (t.currentParticipants || 0), 0);
-  const totalPrizePool = tournaments.reduce((sum: number, t: Tournament) => sum + (t.prizePool || 0), 0);
+  const openCount = tournaments.filter((t) => t.status === 'OPEN' || t.status === 'REGISTRATION').length;
+  const inProgressCount = tournaments.filter((t) => t.status === 'IN_PROGRESS').length;
+  const totalParticipants = tournaments.reduce((sum, t) => sum + (t.currentParticipants || 0), 0);
+  const totalPrizePool = tournaments.reduce((sum, t) => sum + (t.prizePool || 0), 0);
 
   if (error) {
     return (
@@ -382,7 +382,7 @@ const Tournaments: React.FC = () => {
                         </TableCell>
                       </TableRow>
                     ) : (
-                      tournaments.map((tournament: Tournament) => (
+                      tournaments.map((tournament) => (
                         <TableRow key={tournament.id} hover>
                           <TableCell>
                             <Typography variant="body2" fontWeight={600}>

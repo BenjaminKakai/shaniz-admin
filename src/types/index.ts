@@ -5,17 +5,31 @@
 // User Types
 export interface User {
   id: string;
+  externalUserId: string;
   username: string;
-  email?: string;
-  phoneNumber?: string;
-  profilePicture?: string;
-  balance: number;
-  totalGames: number;
-  wins: number;
-  losses: number;
+  email?: string | null;
+  phoneNumber?: string | null;
+  profilePicture?: string | null;
+  balance?: number;
+  totalGames?: number;
+  wins?: number;
+  losses?: number;
   createdAt: string;
-  lastActive: string;
-  status: 'active' | 'suspended' | 'banned';
+  updatedAt?: string;
+  lastActive?: string | null;
+  status?: 'active' | 'suspended' | 'banned';
+  role: 'PLAYER' | 'MODERATOR' | 'ADMIN' | 'SUPER_ADMIN';
+  isActive: boolean;
+  isBanned: boolean;
+  banReason?: string | null;
+  bannedAt?: string | null;
+  bannedUntil?: string | null;
+  _count?: {
+    sessionsAsPlayer1?: number;
+    sessionsAsPlayer2?: number;
+    reports?: number;
+    antiCheatEvents?: number;
+  };
 }
 
 // Game Types
@@ -35,15 +49,21 @@ export interface GameSession {
   id: string;
   gameType: GameType;
   player1Id: string;
-  player1Name: string;
-  player2Id: string;
-  player2Name: string;
+  player1Name?: string;
+  player1?: { id: string; username: string };
+  player2Id?: string;
+  player2Name?: string;
+  player2?: { id: string; username: string };
   stake: number;
-  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'WAITING';
   winnerId?: string;
+  winner?: { id: string; username: string };
   createdAt: string;
+  startedAt?: string;
+  endedAt?: string;
   completedAt?: string;
   duration?: number; // in seconds
+  gameState?: any;
 }
 
 // Tournament Types
@@ -55,10 +75,12 @@ export interface Tournament {
   prizePool: number;
   maxParticipants: number;
   currentParticipants: number;
-  status: 'DRAFT' | 'OPEN' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  status: 'DRAFT' | 'OPEN' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'REGISTRATION';
   startDate: string;
   endDate?: string;
   createdAt: string;
+  winnerId?: string;
+  winner?: { id: string; username: string };
 }
 
 export interface TournamentParticipant {
@@ -87,7 +109,8 @@ export type TransactionStatus = 'PENDING' | 'COMPLETED' | 'FAILED' | 'CANCELLED'
 export interface Transaction {
   id: string;
   userId: string;
-  username: string;
+  username?: string;
+  user?: { id: string; username: string };
   type: TransactionType;
   amount: number;
   status: TransactionStatus;
@@ -95,6 +118,8 @@ export interface Transaction {
   description?: string;
   createdAt: string;
   processedAt?: string;
+  completedAt?: string;
+  metadata?: any;
 }
 
 // Analytics Types
