@@ -20,7 +20,7 @@ import type {
 } from '../types';
 
 // API Configuration
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://18.170.228.240:4065/api/v1';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://16.60.164.64:4065/api/v1';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -56,15 +56,12 @@ api.interceptors.response.use(
 
 export const authService = {
   login: async (email: string, password: string) => {
-    // Admin login with email and password
-    const response = await api.post('/auth/admin/login', {
-      email,
-      password
-    });
-    // Response format: { success, data: { user, accessToken, refreshToken } }
+    // Admin login with email and password at /admin/login
+    const response = await api.post('/admin/login', { email, password });
+    // Response format: { success, data: { token, refreshToken, user } }
     const data = response.data.data || response.data;
     return {
-      token: data.accessToken,
+      token: data.token || data.accessToken,
       user: {
         id: data.user.id,
         email: data.user.email || data.user.username,
@@ -79,7 +76,7 @@ export const authService = {
   },
 
   getCurrentUser: async () => {
-    const response = await api.get('/auth/me');
+    const response = await api.get('/admin/me');
     const data = response.data.data || response.data;
     return {
       id: data.id,
@@ -112,13 +109,25 @@ export const dashboardService = {
   },
 
   getGameStats: async (): Promise<GameStats[]> => {
-    // Backend doesn't have this endpoint yet, return empty
-    return [];
+    try {
+      const response = await api.get('/admin/dashboard/game-stats');
+      const data = response.data.data || response.data;
+      return Array.isArray(data) ? data : [];
+    } catch (error) {
+      console.error('Failed to fetch game stats:', error);
+      return [];
+    }
   },
 
   getRevenueData: async (days: number = 30): Promise<RevenueData[]> => {
-    // Backend doesn't have this endpoint yet, return empty
-    return [];
+    try {
+      const response = await api.get(`/admin/dashboard/revenue?days=${days}`);
+      const data = response.data.data || response.data;
+      return Array.isArray(data) ? data : [];
+    } catch (error) {
+      console.error('Failed to fetch revenue data:', error);
+      return [];
+    }
   },
 };
 

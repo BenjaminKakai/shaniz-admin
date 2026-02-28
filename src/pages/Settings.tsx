@@ -2,7 +2,7 @@
 // SHANIZ GAMING ADMIN - SETTINGS PAGE
 // =============================================================================
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -51,11 +51,29 @@ const Settings: React.FC = () => {
   // Config state
   const [editedConfigs, setEditedConfigs] = useState<Record<string, any>>({});
 
+  // Quick settings state
+  const [quickSettings, setQuickSettings] = useState({
+    matchmaking_enabled: true,
+    tournaments_enabled: true,
+    deposits_enabled: true,
+  });
+
   // Fetch system config
   const { data: configData, isLoading, error, refetch } = useQuery({
     queryKey: ['systemConfig'],
     queryFn: () => configService.getAll(),
   });
+
+  // Initialize quick settings from config data
+  useEffect(() => {
+    if (configData) {
+      setQuickSettings({
+        matchmaking_enabled: configData.matchmaking_enabled ?? true,
+        tournaments_enabled: configData.tournaments_enabled ?? true,
+        deposits_enabled: configData.deposits_enabled ?? true,
+      });
+    }
+  }, [configData]);
 
   // Update config mutation
   const updateConfigMutation = useMutation({
@@ -181,31 +199,61 @@ const Settings: React.FC = () => {
           {/* Quick Settings */}
           <Grid item xs={12}>
             <Card>
-              <CardHeader title="Quick Settings" />
+              <CardHeader title="Quick Settings" subheader="Toggle platform features on/off" />
               <CardContent>
                 <Grid container spacing={3}>
                   <Grid item xs={12} md={4}>
                     <FormControlLabel
-                      control={<Switch defaultChecked />}
+                      control={
+                        <Switch
+                          checked={quickSettings.matchmaking_enabled}
+                          onChange={(e) => {
+                            const newValue = e.target.checked;
+                            setQuickSettings((prev) => ({ ...prev, matchmaking_enabled: newValue }));
+                            updateConfigMutation.mutate({ key: 'matchmaking_enabled', value: newValue });
+                          }}
+                          disabled={updateConfigMutation.isPending}
+                        />
+                      }
                       label="Enable Matchmaking"
                     />
                   </Grid>
                   <Grid item xs={12} md={4}>
                     <FormControlLabel
-                      control={<Switch defaultChecked />}
+                      control={
+                        <Switch
+                          checked={quickSettings.tournaments_enabled}
+                          onChange={(e) => {
+                            const newValue = e.target.checked;
+                            setQuickSettings((prev) => ({ ...prev, tournaments_enabled: newValue }));
+                            updateConfigMutation.mutate({ key: 'tournaments_enabled', value: newValue });
+                          }}
+                          disabled={updateConfigMutation.isPending}
+                        />
+                      }
                       label="Enable Tournaments"
                     />
                   </Grid>
                   <Grid item xs={12} md={4}>
                     <FormControlLabel
-                      control={<Switch defaultChecked />}
+                      control={
+                        <Switch
+                          checked={quickSettings.deposits_enabled}
+                          onChange={(e) => {
+                            const newValue = e.target.checked;
+                            setQuickSettings((prev) => ({ ...prev, deposits_enabled: newValue }));
+                            updateConfigMutation.mutate({ key: 'deposits_enabled', value: newValue });
+                          }}
+                          disabled={updateConfigMutation.isPending}
+                        />
+                      }
                       label="Enable Deposits/Withdrawals"
                     />
                   </Grid>
                 </Grid>
                 <Divider sx={{ my: 2 }} />
                 <Typography variant="caption" color="text.secondary">
-                  Note: These quick settings are for demonstration. Actual settings are managed via System Configuration above.
+                  These settings control platform-wide feature availability. Changes take effect immediately.
                 </Typography>
               </CardContent>
             </Card>
@@ -234,7 +282,7 @@ const Settings: React.FC = () => {
                       API Endpoint
                     </Typography>
                     <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
-                      {process.env.REACT_APP_API_URL || 'http://18.170.228.240:4065/api/v1'}
+                      {process.env.REACT_APP_API_URL || 'http://16.60.164.64:4065/api/v1'}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} md={3}>
